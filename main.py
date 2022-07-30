@@ -51,7 +51,7 @@ for string in source_split:
     item['guid'] = str(hash(item['title'] + item['link'] + item['descr']))
     entries.append(item)
 
-output = '<rss version="2.0"><channel><title>Tutti gli avvisi | Università degli Studi di Milano Statale</title><description>Archivio avvisi generali Unimi</description><link>https://www.unimi.it/it/archivio-avvisi</link>'
+output = '<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>Tutti gli avvisi | Università degli Studi di Milano Statale</title><description>Archivio avvisi generali Unimi</description><link>https://www.unimi.it/it/archivio-avvisi</link>'
 
 text_file = open("./news_it.xml", "w")
 
