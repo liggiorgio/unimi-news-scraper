@@ -1,68 +1,37 @@
 import requests
+import html_parser as p
+import feed_builder as b
 
-x = requests.get('https://www.unimi.it/it/archivio-avvisi')
 
-source = x.text
+# Source URLs
+url_it = 'https://www.unimi.it/it/archivio-avvisi'
+url_en = 'https://www.unimi.it/en/notice-board'
+url_jobs = 'https://www.unimi.it/it/studiare/stage-e-lavoro/lavorare-durante-gli-studi/collaborazioni-studentesche/bandi-collaborazioni-studentesche'
 
-index_from = source.find('<div class="layout ds-1col clearfix">')
-index_to = source.find('<nav class="pager-nav text-center" role="navigation" aria-labelledby="pagination-heading">')
+# Request HTML pages
+res_it = requests.get(url_it)
+res_en = requests.get(url_en)
+res_jobs = requests.get(url_jobs)
 
-source = source[index_from:index_to:]
-source = " ".join(source.split())
-source = source[0:-7:]
+# Extract news as dictionaries
+news_it = p.parseNews(res_it.text, 'it')
+news_en = p.parseNews(res_en.text, 'en')
+news_jobs = p.parseJobs(res_jobs.text)
 
-source_split = source.split('<div class="col-sm-4 views-row views-row">')
+# Generate RSS feeds as strings
+feed_it = b.toFeed(news_it, 'it')
+feed_en = b.toFeed(news_en, 'en')
+feed_jobs = b.toFeed(news_jobs, 'jb')
 
-entries = []
-
-# Parse items
-for string in source_split:
-    _str = string
-    item = {}
-    
-    if 'blu-title pad0 icon promo' in _str:
-        # Orange news
-        idx_f = _str.find('hreflang="it"') + 14
-        idx_t = _str.find('</a>')
-        item['title'] = _str[idx_f:idx_t:]
-
-        idx_f = string.find('<a href="') + 9
-        idx_t = string.find('hreflang="it"') - 2
-        item['link'] = 'https://www.unimi.it' + _str[idx_f:idx_t:]
-
-        idx_f = _str.find('"top10"') + 9
-        _str = _str[idx_f::]
-        idx_t = _str.find('</div>') - 1
-        item['descr'] = _str[0:idx_t:]
-    else:
-        # Blue news
-        idx_f = _str.find('"views-row"') + 12
-        _str = _str[idx_f::]
-        idx_t = _str.find('</div>')
-        item['title'] = _str[0:idx_t:]
-
-        item['link'] = ''
-
-        idx_f = _str.find('"bp-text"') + 11
-        _str = _str[idx_f::]
-        idx_t = _str.find('</div>') - 1
-        item['descr'] = _str[0:idx_t:]
-        
-    item['guid'] = str(hash(item['title'] + item['link'] + item['descr']))
-    entries.append(item)
-
-output = '<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>Tutti gli avvisi | Università degli Studi di Milano Statale</title><description>Archivio avvisi generali Unimi</description><link>https://www.unimi.it/it/archivio-avvisi</link>'
-
+# Write feeds to file
 text_file = open("./news_it.xml", "w")
+text_file.write(feed_it)
+text_file.close()
 
-for entry in entries:
-    output += '<item>'
-    output += '<title>' + entry['title'] + '</title>'
-    output += '<link>' + entry['link'] + '</link>'
-    output += '<description>' + entry['descr'] + '</description>'
-    output += '<guid isPermaLink="false">' + entry['guid'] + '</guid>'
-    output += '</item>'
+text_file = open("./news_en.xml", "w")
+text_file.write(feed_en)
+text_file.close()
 
-output += '</channel></rss>'
-text_file.write(output)
+text_file = open("./news_jobs.xml", "w")
+text_file.write(feed_jobs)
 text_file.close()
