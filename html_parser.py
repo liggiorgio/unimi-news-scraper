@@ -27,7 +27,10 @@ def parseNews(source, lang):
             item['title'] = entry_raw.find('a').text
             item['link'] = 'https://www.unimi.' + lang + entry_raw.find('a')['href']
             descr = entry_raw.find('div', {'class': 'top10'}).decode_contents()
-            descr += '<br/>ℹ️ Leggi la notizia completa sul <a href="' + item['link'] + '">sito</a>'
+            if lang == 'it':
+                descr += '<br/>ℹ️ Leggi la notizia completa sul <a href="' + item['link'] + '">sito</a>'
+            elif lang == 'en':
+                descr += '<br/>ℹ️ Read the full news on the <a href="' + item['link'] + '">website</a>'
             item['description'] = escapeChars(descr)
         else:
             # Blue news
@@ -43,10 +46,6 @@ def parseNews(source, lang):
 
         item['guid'] = str(base64.b64encode((item['title'] + item['description']).encode('utf-8')))
         entries.append(item)
-
-    for entry in entries:
-        print(entry)
-        print()
 
     return entries
 
