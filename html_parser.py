@@ -1,6 +1,4 @@
 import base64
-import unicodedata
-import requests
 
 from bs4 import BeautifulSoup
 
@@ -73,6 +71,7 @@ def parseJobs(source):
     return entries
 
 
+# Switch to Telegram-friendly HTML tags
 def escapeTags(soup, entry):
     # Replace <em>s
     for tag in entry.find_all('em'):
@@ -102,6 +101,8 @@ def escapeTags(soup, entry):
             tag.replace_with(soup.new_string(cfDecodeEmail(tag['data-cfemail'])))
 
 
+# Escape UTF-8 chars due to calling `decode_contents()`
+# TODO: this should be unnecessary, look for BS's escaping options
 def escapeChars(source):
     source = source.replace('\n', '')
     source = source.replace('\xa0', ' ')
