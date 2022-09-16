@@ -16,7 +16,7 @@ def toFeed(entries, lang):
         output += '<guid isPermaLink="false">' + escape(entry['guid']) + '</guid>\n'
         output += '</item>\n'
 
-    output += '</channel>\n</rss>'
+    output += '</channel>\n</rss>\n'
 
     return output
 
