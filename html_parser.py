@@ -39,7 +39,7 @@ def parseNews(source, lang):
                 item['link'] = 'https://www.unimi.it/en/notice-board'
             descr = entry_raw.find('div', {'class': 'bp-text'}).decode_contents()
             for attachment in entry_raw.find_all('div', {'class': 'field--item'}):
-                descr += '<br>📄 ' + attachment.find('a').prettify()
+                descr += '📄 ' + attachment.find('a').prettify()
             item['description'] = escapeChars(descr)
 
         item['guid'] = str(base64.b64encode((item['title'] + item['description']).encode('utf-8')))
