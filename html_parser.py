@@ -20,7 +20,7 @@ def parseNews(source, lang):
         item = {}
         escapeTags(soup, entry_raw)
 
-        if entry_raw.find('div', {'class': 'blu-title pad0 icon promo'}):
+        if entry_raw.find('div', {'class': 'blu-title pad0 icon arrow'}):
             # Orange news
             item['title'] = entry_raw.find('a').text
             item['link'] = 'https://www.unimi.it' + entry_raw.find('a')['href']
@@ -32,7 +32,7 @@ def parseNews(source, lang):
             item['description'] = escapeChars(descr)
         else:
             # Blue news
-            item['title'] = entry_raw.find('div', {'class': 'views-row'}).text
+            item['title'] = entry_raw.find('div', {'class': 'blu-title nero pad0'}).text.strip()
             if lang == 'it':
                 item['link'] = 'https://www.unimi.it/it/archivio-avvisi'
             elif lang == 'en':
