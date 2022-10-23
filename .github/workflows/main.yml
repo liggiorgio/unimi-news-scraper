@@ -2,7 +2,8 @@ name: Python Scraping Scheduled Script
 
 on:
   schedule:
-  - cron: "35 18 * * *"
+  - cron: "0 8-19 * * 1-5"
+  - cron: "0 */6 * * 0,6"
 
   workflow_dispatch:
   
