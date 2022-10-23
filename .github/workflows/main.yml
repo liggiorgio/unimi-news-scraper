@@ -32,7 +32,7 @@ jobs:
           git config --local user.name liggiorgio
           git config --local user.email "liggiorgio@live.com"
           git add --all
-          git commit -am "GH ACTION Scraping $(date)"
+          git diff-index --quiet HEAD || git commit -am "GH ACTION Scraping $(date)"
           git push origin master
         env:
           REPO_KEY: ${{secrets.GITHUB_TOKEN}}
