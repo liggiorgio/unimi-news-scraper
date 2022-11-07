@@ -68,6 +68,8 @@ def parseJobs(source):
         
         entries.append(item)
 
+    entries = sorted(entries, key = lambda d: d['guid'])
+
     return entries
 
 
