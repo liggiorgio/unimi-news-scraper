@@ -2,18 +2,20 @@ import requests
 import html_parser as p
 import feed_builder as b
 
+from bs4 import BeautifulSoup
+from telegraph import Telegraph
 
-url_jobs = 'https://www.unimi.it/it/studiare/stage-e-lavoro/lavorare-durante-gli-studi/collaborazioni-studentesche/bandi-collaborazioni-studentesche'
+
+url_jobs = 'https://www.unimi.it/it/studiare/stage-e-lavoro/lavorare-durante-gli-studi/collaborazioni-studentesche/bandi-collaborazioni/n1-collaborazione-presso-il-dipartimento-di-scienze-gli-alimenti-la-nutrizione-e-lambiente'
 
 res_jobs = requests.get(url_jobs)
+source = res_jobs.text
+soup = BeautifulSoup(source, 'lxml')
 
-news_jobs = p.parseJobs(res_jobs.text)
+header = soup.find('h1', {'class': 'page-header'}).span.text
+author = soup.find('div', {'class': 'icon building'}).a.text
+author_link = 'https://www.unimi.it' + soup.find('div', {'class': 'icon building'}).a['href']
+description = soup.find('div', {'class': 'row bs-2col-bricked node node--type-opportunita node--view-mode-full'}).decode_contents()
 
-p.parseJobsIV((news_jobs[1])['link'])
+print(description)
 exit()
-
-feed_jobs = b.toFeed(news_jobs, 'jb')
-
-text_file = open("./news_jobs.xml", "w")
-text_file.write(feed_jobs)
-text_file.close()
