@@ -3,6 +3,32 @@ from bs4 import BeautifulSoup
 from telegraph import Telegraph
 
 
+# Get Telegraph URL from job listing URL
+def getJobTG(job_url):
+    job_res = requests.get(job_url)
+    source = job_res.text
+    soup = BeautifulSoup(source, 'lxml')
+
+    # Extract main article properties
+    header = soup.find('h1', {'class': 'page-header'}).span.text
+    author = soup.find('div', {'class': 'icon building'}).a.text
+    author_link = 'https://www.unimi.it' + soup.find('div', {'class': 'icon building'}).a['href']
+    cleanTags(soup)
+    temp = soup.find('div', {'class': 'row bs-2col-bricked node node--type-opportunita node--view-mode-full'})
+    description = soup.new_tag('p')
+    temp.wrap(description)
+    temp.unwrap()
+
+    # Create Telegraph article
+    tg = Telegraph()
+    tg.create_account(short_name = 'collaborazioniunimi')
+    response = tg.create_page(title = header,
+        html_content = description.prettify(),
+        author_name = author,
+        author_url = author_link)
+    return response['url']
+
+
 # Remove non-parsable tags
 def cleanTags(soup):
     soup.find('div', {'class': 'col-sm-12 bs-region bs-region--top'}).extract() # Empty
@@ -39,28 +65,3 @@ def cleanTags(soup):
     soup.find('div', {'class': 'pad-attachment'}).unwrap() # Expiring
     soup.find('time').unwrap()
     soup.find('div', {'class': 'col-sm-7 col-md-8 bs-region bs-region--middle'}).extract() # Selections
-
-if __name__ == "__main__":
-    url_jobs = 'https://www.unimi.it/it/studiare/stage-e-lavoro/lavorare-durante-gli-studi/collaborazioni-studentesche/bandi-collaborazioni/n-6-collaborazioni-studentesche-presso-biblioteca-polo-centrale'
-
-    res_jobs = requests.get(url_jobs)
-    source = res_jobs.text
-    soup = BeautifulSoup(source, 'lxml')
-
-    # Extract main article properties
-    header = soup.find('h1', {'class': 'page-header'}).span.text
-    author = soup.find('div', {'class': 'icon building'}).a.text
-    author_link = 'https://www.unimi.it' + soup.find('div', {'class': 'icon building'}).a['href']
-    cleanTags(soup)
-    temp = soup.find('div', {'class': 'row bs-2col-bricked node node--type-opportunita node--view-mode-full'})
-    description = soup.new_tag('p')
-    temp.wrap(description)
-    temp.unwrap()
-
-    tg = Telegraph()
-    tg.create_account(short_name = 'collaborazioniunimi')
-    response = tg.create_page(title = header,
-        html_content = description.prettify(),
-        author_name = author,
-        author_url = author_link)
-    print(response['url'])
