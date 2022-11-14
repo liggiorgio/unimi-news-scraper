@@ -24,14 +24,17 @@ feed_en = bld.toFeed(news_en, 'en')
 feed_jobs = bld.toFeed(news_jobs, 'jb')
 
 # Write feeds to file
-text_file = open("./news_it.xml", "w")
-text_file.write(feed_it)
-text_file.close()
+if len(news_it) > 0:
+    text_file = open("./news_it.xml", "w")
+    text_file.write(feed_it)
+    text_file.close()
 
-text_file = open("./news_en.xml", "w")
-text_file.write(feed_en)
-text_file.close()
+if len(news_en) > 0:
+    text_file = open("./news_en.xml", "w")
+    text_file.write(feed_en)
+    text_file.close()
 
-text_file = open("./news_jobs.xml", "w")
-text_file.write(feed_jobs)
-text_file.close()
+if len(news_jobs) > 0:
+    text_file = open("./news_jobs.xml", "w")
+    text_file.write(feed_jobs)
+    text_file.close()
