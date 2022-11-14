@@ -64,8 +64,9 @@ def parseJobs(source):
 
         item['link'] = 'https://www.unimi.it' + entry_raw.find('a')['href']
         item['title'] = entry_raw.find('a').text
-        item['description'] = '🗓 Scadenza: <i>' + entry_raw.find('time').text + '</i><br><a href=' + getJobTG(item['link']) + '>ℹ️</a> Bando e candidature sul'
+        item['description'] = '🗓 Scadenza: <i>' + entry_raw.find('time').text
         item['guid'] = str(base64.b64encode((item['title'] + item['description']).encode('utf-8')))
+        item['description'] +=  '</i><br><a href=' + getJobTG(item['link']) + '>ℹ️</a> Bando e candidature sul'
         
         entries.append(item)
 
