@@ -1,4 +1,4 @@
-name: Python Scraping Scheduled Script
+name: Python News Scraping Scheduled Script
 
 on:
   schedule:
