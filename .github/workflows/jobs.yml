@@ -26,7 +26,7 @@ jobs:
         with:
           path: "requirements.txt"
       - name: Execute Python Script
-        run: python main.py
+        run: python jobs.py
       - name: Commit Files
         run: |
           git config --local user.name liggiorgio
