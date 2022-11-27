@@ -1,7 +1,6 @@
 import base64
 
 from bs4 import BeautifulSoup
-from telegrapher import getJobTG
 
 # Parse HTML source text and return a dictionary
 # INPUT:    string
@@ -64,9 +63,8 @@ def parseJobs(source):
 
         item['link'] = 'https://www.unimi.it' + entry_raw.find('a')['href']
         item['title'] = entry_raw.find('a').text
-        item['description'] = '🗓 Scadenza: <i>' + entry_raw.find('time').text
+        item['description'] = entry_raw.find('time').text
         item['guid'] = str(base64.b64encode((item['title'] + item['description']).encode('utf-8')))
-        item['description'] +=  '</i><br><a href=' + getJobTG(item['link']) + '>ℹ️</a> Bando e candidature sul'
         
         entries.append(item)
 
