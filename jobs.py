@@ -17,6 +17,10 @@ res_jobs = req.get(url_jobs)
 # Extract news as dictionaries
 news_jobs = prs.parseJobs(res_jobs.text)
 
+# Early exit
+if len(news_jobs) == 0:
+    exit()
+
 # Retrieve IV URLs if they exist, and add them to description
 try:
     iv_file = open('./iv_entries.dat', 'rb+')
@@ -51,7 +55,6 @@ iv_file.close()
 feed_jobs = bld.toFeed(news_jobs, 'jb')
 
 # Write feeds to file
-if len(news_jobs) > 0:
-    text_file = open("./news_jobs.xml", "w")
-    text_file.write(feed_jobs)
-    text_file.close()
+text_file = open("./news_jobs.xml", "w")
+text_file.write(feed_jobs)
+text_file.close()
