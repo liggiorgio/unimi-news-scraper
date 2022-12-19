@@ -128,3 +128,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 test.py
+job_sample.html
+job_sample_2.html
