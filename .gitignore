@@ -128,3 +128,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 test.py
+news_it.xml
+news_en.xml
+news_jobs.xml

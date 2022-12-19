@@ -101,6 +101,10 @@ def escapeTags(soup, entry):
     for tag in entry.find_all('a'):
         if 'data-cfemail' in tag.attrs:
             tag.replace_with(soup.new_string(cfDecodeEmail(tag['data-cfemail'])))
+    # Replace email addresses 2
+    for tag in entry.find_all('a', href=True):
+        if 'email-protection' in tag['href']:
+            tag.replace_with(soup.new_string(cfDecodeEmail(tag['href'].split('#')[1])))
 
 
 # Escape UTF-8 chars due to calling `decode_contents()`
