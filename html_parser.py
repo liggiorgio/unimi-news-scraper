@@ -57,18 +57,13 @@ def parseJobs(source):
 
     # Generate list of dictionaries
     entries = []
-    iter = 0
-    for entry_raw in entries_raw:
-        iter += 1
 
+    for entry_raw in entries_raw:
         item = {}
 
         item['link'] = 'https://www.unimi.it' + entry_raw.find('a')['href']
         item['title'] = entry_raw.find('a').text
-        if iter == 1:
-            item['description'] = '*___' + item['title'] + '___*<br/>' + entry_raw.find('time').text
-        else:
-            item['description'] = entry_raw.find('time').text
+        item['description'] = entry_raw.find('time').text
         item['guid'] = str(base64.b64encode((item['title'] + item['description']).encode('utf-8')))
         
         entries.append(item)
