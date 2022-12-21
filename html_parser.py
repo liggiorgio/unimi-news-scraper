@@ -66,7 +66,7 @@ def parseJobs(source):
         item['link'] = 'https://www.unimi.it' + entry_raw.find('a')['href']
         item['title'] = entry_raw.find('a').text
         if iter == 1:
-            item['description'] = '<b><i><u>' + item['title'] + '</u></i></b><br/>' + entry_raw.find('time').text
+            item['description'] = '<ins>' + item['title'] + '</ins><br/>' + entry_raw.find('time').text
         else:
             item['description'] = entry_raw.find('time').text
         item['guid'] = str(base64.b64encode((item['title'] + item['description']).encode('utf-8')))
