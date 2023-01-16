@@ -45,6 +45,12 @@ def cleanTags(soup):
     soup.find('div', {'class': 'col-sm-12 bs-region bs-region--main'}).unwrap() # Link
     soup.find('span', {'class': 'file-link'}).a['href'] = 'https://www.unimi.it' + soup.find('span', {'class': 'file-link'}).a['href']
     soup.find('span', {'class': 'file-link'}).unwrap() # Link
+    attachs = soup.find('div', {'class': 'field field--name-field-allegati-bando field--type-entity-reference field--label-hidden field--items'})
+    if not attachs == None:
+        attachs.wrap(attachs.find('span', {'class': 'file-link'}).a)
+        new_tag = soup.new_tag('br')
+        attachs.parent.insert_before(new_tag)
+        attachs.decompose()
     soup.find('div', {'class': 'col-sm-6 col-md-4 bs-region bs-region--top-right'}).unwrap() # Deadlines
     soup.find('div', {'class': 'concorsi paragraph--type--bp-docs box-fullgraphic'}).div.unwrap() # Deadlines
     soup.find('div', {'class': 'concorsi paragraph--type--bp-docs box-fullgraphic'}).unwrap() # Deadlines
