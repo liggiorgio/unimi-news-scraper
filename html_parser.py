@@ -24,7 +24,8 @@ def parseNews(source, lang):
             # Orange news
             item['title'] = entry_raw.find('a').text
             item['link'] = 'https://www.unimi.it' + entry_raw.find('a')['href']
-            descr = entry_raw.find('div', {'class': 'top10'}).decode_contents()
+            content = entry_raw.find('div', {'class': 'top10'})
+            descr = '' if content == None else content.decode_contents()
             if lang == 'it':
                 descr += '<br/>ℹ️ Leggi la notizia completa sul <a href="' + item['link'] + '">sito</a>'
             elif lang == 'en':
