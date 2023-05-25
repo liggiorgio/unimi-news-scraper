@@ -26,6 +26,9 @@ jobs:
         with:
           path: "requirements.txt"
       - name: Execute Python Script
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
         run: python jobs.py
       - name: Commit Files
         run: |
