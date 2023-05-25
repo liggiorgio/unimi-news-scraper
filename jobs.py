@@ -56,7 +56,7 @@ for item in news_jobs:
     else:
         new_iv_dict[key] = iv_dict[key]
         print('Existing key retrieved from dict')
-    item['description'] = '🗓 Scadenza: <i>' + item['description'] + '</i><br><a href="' + new_iv_dict[key] + '">ℹ️</a> Bando e candidature sul'
+    #item['description'] = '🗓 Scadenza: <i>' + item['description'] + '</i><br><a href="' + new_iv_dict[key] + '">ℹ️</a> Bando e candidature sul'
 
     if not item['guid'] in checklist:
         checklist.append(item['guid'])
