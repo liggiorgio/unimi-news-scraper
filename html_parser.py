@@ -1,4 +1,5 @@
 import base64
+import hashlib
 
 from bs4 import BeautifulSoup
 
@@ -18,7 +19,7 @@ def parseNews(source, lang):
 
     for entry_raw in entries_raw:
         item = {}
-        escapeTags(soup, entry_raw)
+        escape_tags(soup, entry_raw)
 
         if entry_raw.find('div', {'class': 'blu-title pad0 icon arrow'}):
             # Orange news
@@ -30,7 +31,7 @@ def parseNews(source, lang):
                 descr += '<br/>ℹ️ Leggi la notizia completa sul <a href="' + item['link'] + '">sito</a>'
             elif lang == 'en':
                 descr += '<br/>ℹ️ Read the full news on the <a href="' + item['link'] + '">website</a>'
-            item['description'] = escapeChars(descr)
+            item['description'] = escape_chars(descr)
         else:
             # Blue news
             item['title'] = entry_raw.find('div', {'class': 'blu-title nero pad0'}).text.strip()
@@ -41,7 +42,7 @@ def parseNews(source, lang):
             descr = entry_raw.find('div', {'class': 'bp-text'}).decode_contents()
             for attachment in entry_raw.find_all('div', {'class': 'field--item'}):
                 descr += '📄 ' + attachment.find('a').prettify()
-            item['description'] = escapeChars(descr)
+            item['description'] = escape_chars(descr)
 
         item['guid'] = str(base64.b64encode((item['title'] + item['description']).encode('utf-8')))
         entries.append(item)
@@ -62,10 +63,10 @@ def parseJobs(source):
     for entry_raw in entries_raw:
         item = {}
 
-        item['link'] = 'https://www.unimi.it' + entry_raw.find('a')['href']
-        item['title'] = entry_raw.find('a').text
-        item['description'] = entry_raw.find('time').text
-        item['guid'] = str(base64.b64encode((item['title'] + item['description']).encode('utf-8')))
+        item['link'] = escape_chars( 'https://www.unimi.it' + entry_raw.find('a')['href'] )
+        item['title'] = escape_chars( entry_raw.find('a').text )
+        item['description'] = escape_chars( entry_raw.find('time').text )
+        item['guid'] = get_guid(item['link'] + item['description'])
         
         entries.append(item)
 
@@ -75,7 +76,7 @@ def parseJobs(source):
 
 
 # Switch to Telegram-friendly HTML tags
-def escapeTags(soup, entry):
+def escape_tags(soup, entry):
     # Replace <em>s
     for tag in entry.find_all('em'):
         new_tag = soup.new_tag('i')
@@ -101,25 +102,32 @@ def escapeTags(soup, entry):
     # Replace email addresses
     for tag in entry.find_all('a'):
         if 'data-cfemail' in tag.attrs:
-            tag.replace_with(soup.new_string(cfDecodeEmail(tag['data-cfemail'])))
+            tag.replace_with(soup.new_string(cf_decode_email(tag['data-cfemail'])))
     # Replace email addresses 2
     for tag in entry.find_all('a', href=True):
         if 'email-protection' in tag['href']:
-            new_tag = soup.new_tag(name='a', attrs={'href':'mailto:'+cfDecodeEmail(tag['href'].split('#')[1])})
+            new_tag = soup.new_tag(name='a', attrs={'href':'mailto:'+cf_decode_email(tag['href'].split('#')[1])})
             new_tag.string = tag.string
             tag.replace_with(new_tag)
 
 
 # Escape UTF-8 chars due to calling `decode_contents()`
 # TODO: this should be unnecessary, look for BS's escaping options
-def escapeChars(source):
+def escape_chars(source):
     source = source.replace('\n', '')
     source = source.replace('\xa0', ' ')
+    source = source.replace('.', '\.')
+    source = source.replace('-', '\-')
     return source
 
 
 # Decode email addresses obfuscated by CloudFare
-def cfDecodeEmail(encodedString):
+def cf_decode_email(encodedString):
     r = int(encodedString[:2],16)
     decodedString = ''.join([chr(int(encodedString[i:i+2], 16) ^ r) for i in range(2, len(encodedString), 2)])
     return decodedString
+
+
+# Generate GUID for each listing
+def get_guid(string:str) -> str:
+    return hashlib.sha1(str.encode(string)).hexdigest()
