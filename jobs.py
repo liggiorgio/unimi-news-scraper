@@ -10,6 +10,10 @@ import html_parser as prs
 from telegrapher import getJobTG
 
 
+def esc_md(string):
+    return string.replace('.','\.').replace('-','\-')
+
+
 BOT_TOKEN = os.environ['BOT_TOKEN']
 CHAT_ID = os.environ['CHAT_ID']
 
@@ -60,7 +64,7 @@ for item in news_jobs:
 
     if not item['guid'] in checklist:
         checklist.append(item['guid'])
-        message = '*'+item['title']+'*\n🗓 Scadenza: _'+item['description']+'_\n[ℹ️]('+new_iv_dict[key].replace('-','\-')+') Bando e candidature sul [sito]('+item['link']+')'
+        message = '*'+esc_md(item['title'])+'*\n🗓 Scadenza: _'+esc_md(item['description'])+'_\n[ℹ️]('+esc_md(new_iv_dict[key])+') Bando e candidature sul [sito]('+esc_md(item['link'])+')'
         url_send = f'https://api.telegram.org/bot{BOT_TOKEN}/sendMessage?chat_id={CHAT_ID}&text={message}&parse_mode=MarkdownV2'
         print(req.get(url=url_send).json())
 

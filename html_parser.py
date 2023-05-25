@@ -63,9 +63,9 @@ def parseJobs(source):
     for entry_raw in entries_raw:
         item = {}
 
-        item['link'] = escape_chars( 'https://www.unimi.it' + entry_raw.find('a')['href'] )
-        item['title'] = escape_chars( entry_raw.find('a').text )
-        item['description'] = escape_chars( entry_raw.find('time').text )
+        item['link'] = 'https://www.unimi.it' + entry_raw.find('a')['href']
+        item['title'] = entry_raw.find('a').text
+        item['description'] = entry_raw.find('time').text
         item['guid'] = get_guid(item['link'] + item['description'])
         
         entries.append(item)
@@ -116,8 +116,6 @@ def escape_tags(soup, entry):
 def escape_chars(source):
     source = source.replace('\n', '')
     source = source.replace('\xa0', ' ')
-    source = source.replace('.', '\.')
-    source = source.replace('-', '\-')
     return source
 
 
