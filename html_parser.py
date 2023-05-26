@@ -42,6 +42,8 @@ def parseNews(source, lang):
             descr = entry_raw.find('div', {'class': 'bp-text'}).decode_contents()
             for attachment in entry_raw.find_all('div', {'class': 'field--item'}):
                 descr += '📄 ' + attachment.find('a').prettify()
+            for hyperlink in entry_raw.find_all('div', {'class': 'icon link'}):
+                descr += '🔗 ' + hyperlink.find('a').prettify()
             item['description'] = escape_chars(descr)
 
         item['guid'] = str(base64.b64encode((item['title'] + item['description']).encode('utf-8')))
