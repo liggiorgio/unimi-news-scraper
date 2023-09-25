@@ -12,6 +12,8 @@ def getJobTG(job_url):
     # Extract main article properties
     header = soup.find('h1', {'class': 'page-header'}).span.text
     author = soup.find('div', {'class': 'icon building'}).a.text
+    author = f'{author[:125]}...' if len(author) > 128 else author
+    #print(f'Author length: {len(author)}')
     author_link = 'https://www.unimi.it' + soup.find('div', {'class': 'icon building'}).a['href']
     cleanTags(soup)
     temp = soup.find('div', {'class': 'row bs-2col-bricked node node--type-opportunita node--view-mode-full'})
