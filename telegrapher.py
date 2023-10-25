@@ -73,3 +73,5 @@ def cleanTags(soup):
     soup.find('div', {'class': 'pad-attachment'}).unwrap() # Expiring
     soup.find('time').unwrap()
     soup.find('div', {'class': 'col-sm-7 col-md-8 bs-region bs-region--middle'}).extract() # Selections
+    for span in soup.find_all('span'):
+        span.unwrap()
