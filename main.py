@@ -12,12 +12,12 @@ res_it = req.get(url_it)
 res_en = req.get(url_en)
 
 # Extract news as dictionaries
-news_it = prs.parseNews(res_it.text, 'it')
-news_en = prs.parseNews(res_en.text, 'en')
+news_it = prs.parse_news(res_it.text, 'it')
+news_en = prs.parse_news(res_en.text, 'en')
 
 # Generate RSS feeds as strings
-feed_it = bld.toFeed(news_it, 'it')
-feed_en = bld.toFeed(news_en, 'en')
+feed_it = bld.to_feed(news_it, 'it')
+feed_en = bld.to_feed(news_en, 'en')
 
 # Write feeds to file
 if len(news_it) > 0:

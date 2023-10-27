@@ -3,12 +3,30 @@ import hashlib
 
 from bs4 import BeautifulSoup
 
-# Parse HTML source text and return a dictionary
-# INPUT:    string
-# OUTPUT:   dictionary
+
+IDX = {
+    'it': 0,
+    'en': 1
+}
+DESCR1 = [
+    '<br/>ℹ️ Leggi la notizia completa sul <a href="',
+    '<br/>ℹ️ Read the full news on the <a href="'
+    ]
+DESCR2 = [
+    '">sito</a>',
+    '">website</a>'
+    ]
+URL_UNIMI = 'https://www.unimi.it'
+URL_BOARD = [
+    '/it/archivio-avvisi',
+    '/en/notice-board'
+    ]
+ICON_FILE = '📄'
+ICON_LINK = '🔗'
+
 
 # Parse general news
-def parseNews(source, lang):
+def parse_news(source: str, lang: str):
     soup = BeautifulSoup(source, 'lxml')
 
     # Get individual news blocks
@@ -18,42 +36,35 @@ def parseNews(source, lang):
     entries = []
 
     for entry_raw in entries_raw:
-        item = {}
         escape_tags(soup, entry_raw)
-
+        
+        item = {}
         if entry_raw.find('div', {'class': 'blu-title pad0 icon arrow'}):
             # Orange news
             item['title'] = entry_raw.find('a').text
-            item['link'] = 'https://www.unimi.it' + entry_raw.find('a')['href']
+            item['link'] = f'{URL_UNIMI}{entry_raw.find("a")["href"]}'
             content = entry_raw.find('div', {'class': 'top10'})
-            descr = '' if content == None else content.decode_contents()
-            if lang == 'it':
-                descr += '<br/>ℹ️ Leggi la notizia completa sul <a href="' + item['link'] + '">sito</a>'
-            elif lang == 'en':
-                descr += '<br/>ℹ️ Read the full news on the <a href="' + item['link'] + '">website</a>'
-            item['description'] = escape_chars(descr)
+            descr = content.decode_contents() if content else ''
+            descr += f'{DESCR1[IDX[lang]]}{item["link"]}{DESCR2[IDX[lang]]}'
         else:
             # Blue news
             item['title'] = entry_raw.find('div', {'class': 'blu-title nero pad0'}).text.strip()
-            if lang == 'it':
-                item['link'] = 'https://www.unimi.it/it/archivio-avvisi'
-            elif lang == 'en':
-                item['link'] = 'https://www.unimi.it/en/notice-board'
+            item['link'] = f'{URL_UNIMI}{URL_BOARD[IDX[lang]]}'
             descr = entry_raw.find('div', {'class': 'bp-text'}).decode_contents()
             for attachment in entry_raw.find_all('div', {'class': 'field--item'}):
-                descr += '📄 ' + attachment.find('a').prettify()
+                descr += f'{ICON_FILE}{attachment.find("a").prettify()}'
             for hyperlink in entry_raw.find_all('div', {'class': 'icon link'}):
-                descr += '🔗 ' + hyperlink.find('a').prettify()
-            item['description'] = escape_chars(descr)
-
+                descr += f'{ICON_LINK}{hyperlink.find("a").prettify()}'
+        item['description'] = escape_chars(descr)
         item['guid'] = str(base64.b64encode((item['title'] + item['description']).encode('utf-8')))
+        
         entries.append(item)
 
     return entries
 
 
 # Parse part-time contracts
-def parseJobs(source):
+def parse_jobs(source: str):
     soup = BeautifulSoup(source, 'lxml')
 
     # Get individual job blocks
@@ -64,8 +75,7 @@ def parseJobs(source):
 
     for entry_raw in entries_raw:
         item = {}
-
-        item['link'] = 'https://www.unimi.it' + entry_raw.find('a')['href']
+        item['link'] = f'{URL_UNIMI}{entry_raw.find("a")["href"]}'
         item['title'] = entry_raw.find('a').text
         item['description'] = entry_raw.find('time').text
         item['guid'] = get_guid(item['link'] + item['description'])
@@ -73,7 +83,6 @@ def parseJobs(source):
         entries.append(item)
 
     entries = sorted(entries, key = lambda d: d['guid'])
-
     return entries
 
 
