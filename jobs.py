@@ -7,7 +7,7 @@ import requests as req
 
 import feed_builder as bld
 import html_parser as prs
-from telegrapher import getJobTG
+from telegrapher import create_job_IV_page
 
 
 def esc_md(string):
@@ -24,7 +24,7 @@ url_jobs = 'https://www.unimi.it/it/studiare/stage-e-lavoro/lavorare-durante-gli
 res_jobs = req.get(url_jobs)
 
 # Extract news as dictionaries
-news_jobs = prs.parseJobs(res_jobs.text)
+news_jobs = prs.parse_jobs(res_jobs.text)
 
 # Early exit
 if len(news_jobs) == 0:
@@ -54,7 +54,7 @@ finally:
 for item in news_jobs:
     key = str(base64.b64encode((item['link'] + item['description']).encode('utf-8')))
     if not key in iv_dict:
-        iv_link = getJobTG(item['link'])
+        iv_link = create_job_IV_page(item['link'])
         new_iv_dict[key] = iv_link
         print('New IV link generated')
     else:
@@ -82,7 +82,7 @@ pickle.dump(checklist, checklist_file)
 checklist_file.close()
 
 # Generate RSS feeds as strings
-feed_jobs = bld.toFeed(news_jobs, 'jb')
+feed_jobs = bld.to_feed(news_jobs, 'jb')
 
 # Write feeds to file
 text_file = open("./news_jobs.xml", "w")
