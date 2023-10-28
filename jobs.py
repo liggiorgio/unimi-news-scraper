@@ -17,8 +17,25 @@ IV_ENTRIES_FILE = 'iv_entries.dat'
 JOBS_FEED_FILE = 'news_jobs.xml'
 
 
-def escape_md(string):
-    return string.replace('.','\.').replace('-','\-')
+def escape_md(str):
+    return str.replace('_','\_') \
+              .replace('*','\*') \
+              .replace('[','\[') \
+              .replace(']','\]') \
+              .replace('(','\(') \
+              .replace(')','\)') \
+              .replace('~','\~') \
+              .replace('`','\`') \
+              .replace('>','\>') \
+              .replace('#','\#') \
+              .replace('+','\+') \
+              .replace('-','\-') \
+              .replace('=','\=') \
+              .replace('|','\|') \
+              .replace('{','\{') \
+              .replace('}','\}') \
+              .replace('.','\.') \
+              .replace('!','\!')
 
 
 def load_checklist():
