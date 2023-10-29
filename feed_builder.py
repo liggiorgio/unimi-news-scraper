@@ -32,7 +32,7 @@ GUID = ['<guid isPermaLink="false">', '</guid>']
 
 
 # Create an XML RSS feed
-def to_feed(entries: list[dict], kind: str):
+def to_feed(entries: list, kind: str):
     output: str = f'{DECLARATION}{RSS[0]}{CHANNEL[0]}'
     
     output += f'{TITLE[0]}{FEED_NAME[IDX[kind]]}{TITLE[1]}'
@@ -41,10 +41,10 @@ def to_feed(entries: list[dict], kind: str):
 
     for entry in entries:
         output += f'{ITEM[0]}'
-        output += f'{TITLE[0]}{escape(entry["title"])}{TITLE[1]}'
-        output += f'{LINK[0]}{escape(entry["link"])}{LINK[1]}'
-        output += f'{DESCR[0]}{escape(entry["description"])}{DESCR[1]}'
-        output += f'{GUID[0]}{escape(entry["guid"])}{GUID[1]}'
+        output += f'{TITLE[0]}{escape(entry.title)}{TITLE[1]}'
+        output += f'{LINK[0]}{escape(entry.link)}{LINK[1]}'
+        output += f'{DESCR[0]}{escape(entry.descr)}{DESCR[1]}'
+        output += f'{GUID[0]}{escape(entry.guid)}{GUID[1]}'
         output += f'{ITEM[1]}'
 
     output += f'{CHANNEL[1]}{RSS[1]}'
