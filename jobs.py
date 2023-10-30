@@ -1,90 +1,37 @@
-import base64
-import hashlib
 import os
-import pickle
+import requests
 
-import requests as req
-
-import feed_builder as bld
-import html_parser as prs
-from telegrapher import getJobTG
-
-
-def esc_md(string):
-    return string.replace('.','\.').replace('-','\-')
+from feed_builder import to_feed
+from html_parser import parse_jobs
+from telegrapher import create_job_IV_page
+from utils import *
 
 
 BOT_TOKEN = os.environ['BOT_TOKEN']
-CHAT_ID = os.environ['CHAT_ID']
+CHAT_ID = os.environ['CHAT_ID_JOBS']
+JOBS_URL = 'https://www.unimi.it/it/studiare/stage-e-lavoro/lavorare-durante-gli-studi/collaborazioni-studentesche/bandi-collaborazioni-studentesche'
+JOBS_CHECKLIST_FILE = 'checklist_jobs.dat'
+JOBS_FEED_FILE = 'news_jobs.xml'
 
-# Source URLs
-url_jobs = 'https://www.unimi.it/it/studiare/stage-e-lavoro/lavorare-durante-gli-studi/collaborazioni-studentesche/bandi-collaborazioni-studentesche'
 
-# Request HTML pages
-res_jobs = req.get(url_jobs)
+def main():
+    jobs_res = requests.get(JOBS_URL)
+    jobs_entries = parse_jobs(jobs_res.text)
+    
+    if jobs_entries:
+        jobs_checklist = load_checklist(JOBS_CHECKLIST_FILE)
 
-# Extract news as dictionaries
-news_jobs = prs.parseJobs(res_jobs.text)
+        for entry in jobs_entries[::-1]:
+            if not [job for job in jobs_checklist if job.guid == entry.guid]:
+                entry.iv = create_job_IV_page(entry.link)
+                jobs_checklist.append(entry)
+                send_job_message(entry, BOT_TOKEN, CHAT_ID)
 
-# Early exit
-if len(news_jobs) == 0:
-    exit()
+        save_checklist(jobs_checklist[-50:], JOBS_CHECKLIST_FILE)
 
-# Load checklist to avoid repetitions
-try:
-    checklist_file = open('./jobs_checklist.dat', 'rb+')
-except:
-    checklist = []
-else:
-    checklist = pickle.load(checklist_file)
-    checklist_file.close()
+        jobs_feed = to_feed(jobs_entries, 'jb')
+        save_feed(jobs_feed, JOBS_FEED_FILE)
 
-# Retrieve IV URLs if they exist, and add them to description
-try:
-    iv_file = open('./iv_entries.dat', 'rb+')
-except:
-    iv_dict = {}
-else:
-    iv_dict = pickle.load(iv_file)
-    iv_file.close()
-finally:
-    new_iv_dict = {}
 
-# Do
-for item in news_jobs:
-    key = str(base64.b64encode((item['link'] + item['description']).encode('utf-8')))
-    if not key in iv_dict:
-        iv_link = getJobTG(item['link'])
-        new_iv_dict[key] = iv_link
-        print('New IV link generated')
-    else:
-        new_iv_dict[key] = iv_dict[key]
-        print('Existing key retrieved from dict')
-    #item['description'] = '🗓 Scadenza: <i>' + item['description'] + '</i><br><a href="' + new_iv_dict[key] + '">ℹ️</a> Bando e candidature sul'
-
-    if not item['guid'] in checklist:
-        checklist.append(item['guid'])
-        message = '*'+esc_md(item['title'])+'*\n🗓 Scadenza: _'+esc_md(item['description'])+'_\n[ℹ️]('+esc_md(new_iv_dict[key])+') Bando e candidature sul [sito]('+esc_md(item['link'])+')'
-        url_send = f'https://api.telegram.org/bot{BOT_TOKEN}/sendMessage?chat_id={CHAT_ID}&text={message}&parse_mode=MarkdownV2'
-        print(req.get(url=url_send).json())
-
-# Save IV links
-iv_file = open('iv_entries.dat', 'wb+')
-pickle.dump(new_iv_dict, iv_file)
-iv_file.close()
-
-# Save previous entries (prevents reposting to channel)
-while len(checklist) > 50:
-    del checklist[0]
-
-checklist_file = open('jobs_checklist.dat', 'wb+')
-pickle.dump(checklist, checklist_file)
-checklist_file.close()
-
-# Generate RSS feeds as strings
-feed_jobs = bld.toFeed(news_jobs, 'jb')
-
-# Write feeds to file
-text_file = open("./news_jobs.xml", "w")
-text_file.write(feed_jobs)
-text_file.close()
+if __name__ == '__main__':
+    main()
