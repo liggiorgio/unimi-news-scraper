@@ -7,12 +7,12 @@ IDX = {
     'en': 1
 }
 DESCR1 = [
-    'ℹ️ Leggi la notizia completa sul <a href="',
-    'ℹ️ Read the full news on the <a href="'
+    '▶️ Scopri di più su <a href="',
+    '▶️ Learn more on <a href="'
     ]
 DESCR2 = [
-    '">sito</a>',
-    '">website</a>'
+    '">Unimi.it</a>',
+    '">Unimi.it</a>'
     ]
 URL_HOME = 'https://www.unimi.it'
 URL_BOARD = [
@@ -76,16 +76,6 @@ def parse_jobs(source: str):
 
 # Switch to Telegram-friendly HTML tags
 def escape_tags(soup, entry):
-    # Replace <em>s
-    #for tag in entry.find_all('em'):
-    #    new_tag = soup.new_tag('i')
-    #    tag.wrap(new_tag)
-    #    tag.unwrap()
-    # Replace <strong>s
-    #for tag in entry.find_all('strong'):
-    #    new_tag = soup.new_tag('b')
-    #    tag.wrap(new_tag)
-    #    tag.unwrap()
     # Remove <span>s
     for tag in entry.find_all('span'):
         tag.unwrap()
