@@ -1,103 +1,37 @@
-import base64
 import os
-import pickle
 import requests
-import sys
 
 from feed_builder import to_feed
 from html_parser import parse_jobs
 from telegrapher import create_job_IV_page
+from utils import *
 
 
 BOT_TOKEN = os.environ['BOT_TOKEN']
-CHAT_ID = os.environ['CHAT_ID']
+CHAT_ID = os.environ['CHAT_ID_JOBS']
 JOBS_URL = 'https://www.unimi.it/it/studiare/stage-e-lavoro/lavorare-durante-gli-studi/collaborazioni-studentesche/bandi-collaborazioni-studentesche'
-JOBS_PREV_ENTRIES_FILE = 'jobs_checklist.dat'
-IV_ENTRIES_FILE = 'iv_entries.dat'
+JOBS_CHECKLIST_FILE = 'checklist_jobs.dat'
 JOBS_FEED_FILE = 'news_jobs.xml'
 
 
-def escape_md(str):
-    return str.replace('_','\_') \
-              .replace('*','\*') \
-              .replace('[','\[') \
-              .replace(']','\]') \
-              .replace('(','\(') \
-              .replace(')','\)') \
-              .replace('~','\~') \
-              .replace('`','\`') \
-              .replace('>','\>') \
-              .replace('#','\#') \
-              .replace('+','\+') \
-              .replace('-','\-') \
-              .replace('=','\=') \
-              .replace('|','\|') \
-              .replace('{','\{') \
-              .replace('}','\}') \
-              .replace('.','\.') \
-              .replace('!','\!')
-
-
-def load_checklist():
-    try:
-        with open(JOBS_PREV_ENTRIES_FILE, 'rb+') as checklist_file:
-            return pickle.load(checklist_file)
-    except FileNotFoundError:
-        return []
-
-
-def save_checklist(job_entries: list):
-    with open(JOBS_PREV_ENTRIES_FILE, 'wb+') as checklist_file:
-        pickle.dump(job_entries, checklist_file)
-
-
-def load_iv_dict():
-    try:
-        with open(IV_ENTRIES_FILE, 'rb+') as iv_file:
-            return pickle.load(iv_file)
-    except FileNotFoundError:
-        return {}
-
-
-def save_iv_dict(iv_entries: dict):
-    with open(IV_ENTRIES_FILE, 'wb+') as iv_file:
-        pickle.dump(iv_entries, iv_file)
-
-
-def send_telegram_message(msg: str):
-    url_send = f'https://api.telegram.org/bot{BOT_TOKEN}/sendMessage?chat_id={CHAT_ID}&text={msg}&parse_mode=MarkdownV2'
-    requests.post(url=url_send)
-
-
 def main():
-    res_jobs = requests.get(JOBS_URL)
-    news_jobs = parse_jobs(res_jobs.text)
-    if not news_jobs:
-        sys.exit()
+    jobs_res = requests.get(JOBS_URL)
+    jobs_entries = parse_jobs(jobs_res.text)
+    
+    if jobs_entries:
+        jobs_checklist = load_checklist(JOBS_CHECKLIST_FILE)
 
-    jobs_checklist = load_checklist()
-    iv_dict = load_iv_dict()
-    new_iv_dict = {}
+        for entry in jobs_entries[::-1]:
+            if not [job for job in jobs_checklist if job.guid == entry.guid]:
+                entry.iv = create_job_IV_page(entry.link)
+                jobs_checklist.append(entry)
+                send_job_message(entry, BOT_TOKEN, CHAT_ID)
 
-    for item in news_jobs:
-        iv_guid = str(base64.b64encode((item['link'] + item['description']).encode('utf-8')))
-        iv_link = iv_dict.get(iv_guid, create_job_IV_page(item['link']))
-        new_iv_dict[iv_guid] = iv_link
+        save_checklist(jobs_checklist[-50:], JOBS_CHECKLIST_FILE)
 
-        if not item['guid'] in jobs_checklist:
-            jobs_checklist.append(item['guid'])
-            title = f'_*__{escape_md(item["title"])}__*_'
-            deadline = f'🗓 Scadenza: _{escape_md(item["description"])}_'
-            info = f'[ℹ️]({new_iv_dict[iv_guid]}) Bando e candidature sul [sito]({item["link"]})'
-            message = f'{title}\n{deadline}\n{info}'
-            send_telegram_message(message)
+        jobs_feed = to_feed(jobs_entries, 'jb')
+        save_feed(jobs_feed, JOBS_FEED_FILE)
 
-    save_iv_dict(new_iv_dict)
-    save_checklist(jobs_checklist[-50:])
-
-    feed_jobs = to_feed(news_jobs, 'jb')
-    with open(JOBS_FEED_FILE, 'w') as feed_file:
-        feed_file.write(feed_jobs)
 
 if __name__ == '__main__':
     main()
