@@ -29,8 +29,8 @@ jobs:
       - name: Execute Python Script
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-          CHAT_ID_IT: ${{ secrets.CHAT_ID_NEWS_IT }}
-          CHAT_ID_EN: ${{ secrets.CHAT_ID_NEWS_EN }}
+          CHAT_ID_NEWS_IT: ${{ secrets.CHAT_ID_NEWS_IT }}
+          CHAT_ID_NEWS_EN: ${{ secrets.CHAT_ID_NEWS_EN }}
         run: python main.py
       - name: Commit Files
         run: |
