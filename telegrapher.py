@@ -1,3 +1,6 @@
+import imgkit
+import json
+import os
 import requests as req
 
 from bs4 import BeautifulSoup
@@ -109,3 +112,35 @@ def clean_tags_jobs(soup):
     soup.find('div', {'class': 'col-sm-7 col-md-8 bs-region bs-region--middle'}).extract() #selections
     for span in soup.find_all('span'):
         span.unwrap()
+    for table in soup.find_all('table'):
+        filename = 'table.jpg'
+        opts = {'format': 'jpg', 'encoding': 'UTF-8', 'width': '400'}
+        imgkit.from_string(table.prettify(), filename, css='style.css', options=opts)
+        img_url = telegraph_file_upload(filename)
+        os.remove(filename)
+        img = soup.new_tag('img')
+        img['src'] = img_url
+        table.insert_before(img)
+        table.decompose()
+
+
+def telegraph_file_upload(path_to_file):
+    # From: https://stackoverflow.com/questions/70291947/telegraph-api-upload-file
+
+    file_types = {'gif': 'image/gif', 'jpeg': 'image/jpeg', 'jpg': 'image/jpg', 'png': 'image/png', 'mp4': 'video/mp4'}
+    file_ext = path_to_file.split('.')[-1]
+    
+    if file_ext in file_types:
+        file_type = file_types[file_ext]
+    else:
+        return f'error, {file_ext}-file can not be proccessed' 
+      
+    with open(path_to_file, 'rb') as f:
+        url = 'https://telegra.ph/upload'
+        response = req.post(url, files={'file': ('file', f, file_type)}, timeout=1)
+    
+    telegraph_url = json.loads(response.content)
+    telegraph_url = telegraph_url[0]['src']
+    telegraph_url = f'https://telegra.ph{telegraph_url}'
+    
+    return telegraph_url

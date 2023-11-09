@@ -1,0 +1,13 @@
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: #333333;
+  font: 18px Roboto, sans-serif;
+  line-height: 1.25;
+}
+
+tbody td {
+    background: #efefef;
+    border: 1px solid #fff;
+    padding: 10px;
+  }
