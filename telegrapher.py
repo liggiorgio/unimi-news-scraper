@@ -93,22 +93,24 @@ def clean_tags_jobs(soup):
     soup.find('div', {'class': 'col-sm-6 col-md-4 bs-region bs-region--top-right'}).unwrap() #deadlines
     soup.find('div', {'class': 'concorsi paragraph--type--bp-docs box-fullgraphic'}).div.unwrap() #deadlines
     soup.find('div', {'class': 'concorsi paragraph--type--bp-docs box-fullgraphic'}).unwrap() #deadlines
-    new_tag = soup.new_tag('h3')
-    soup.find('div', {'class': 'blu-title field-label-above'}).wrap(new_tag)
-    soup.find('div', {'class': 'blu-title field-label-above'}).unwrap() #"Pubblicato"
-    soup.find('div', {'class': 'bp-attachment icon published flex'}).unwrap() #container
-    new_tag = soup.new_tag('i')
-    soup.find('div', {'class': 'pad-attachment'}).wrap(new_tag)
-    soup.find('div', {'class': 'pad-attachment'}).unwrap() #published
-    soup.find('time').unwrap()
-    new_tag = soup.new_tag('h3')
-    soup.find('div', {'class': 'blu-title field-label-above'}).wrap(new_tag)
-    soup.find('div', {'class': 'blu-title field-label-above'}).unwrap() #"Scandenza"
-    soup.find('div', {'class': 'bp-attachment icon clock flex'}).unwrap() #container
-    new_tag = soup.new_tag('i')
-    soup.find('div', {'class': 'pad-attachment'}).wrap(new_tag)
-    soup.find('div', {'class': 'pad-attachment'}).unwrap() #expiring
-    soup.find('time').unwrap()
+    if soup.find('div', {'class': 'bp-attachment icon published flex'}):
+        new_tag = soup.new_tag('h3')
+        soup.find('div', {'class': 'blu-title field-label-above'}).wrap(new_tag)
+        soup.find('div', {'class': 'blu-title field-label-above'}).unwrap() #"Pubblicato"
+        soup.find('div', {'class': 'bp-attachment icon published flex'}).unwrap() #container
+        new_tag = soup.new_tag('i')
+        soup.find('div', {'class': 'pad-attachment'}).wrap(new_tag)
+        soup.find('div', {'class': 'pad-attachment'}).unwrap() #published
+        soup.find('time').unwrap()
+    if soup.find('div', {'class': 'bp-attachment icon clock flex'}):
+        new_tag = soup.new_tag('h3')
+        soup.find('div', {'class': 'blu-title field-label-above'}).wrap(new_tag)
+        soup.find('div', {'class': 'blu-title field-label-above'}).unwrap() #"Scandenza"
+        soup.find('div', {'class': 'bp-attachment icon clock flex'}).unwrap() #container
+        new_tag = soup.new_tag('i')
+        soup.find('div', {'class': 'pad-attachment'}).wrap(new_tag)
+        soup.find('div', {'class': 'pad-attachment'}).unwrap() #expiring
+        soup.find('time').unwrap()
     soup.find('div', {'class': 'col-sm-7 col-md-8 bs-region bs-region--middle'}).extract() #selections
     for span in soup.find_all('span'):
         span.unwrap()
