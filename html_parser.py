@@ -45,11 +45,14 @@ def parse_news(source: str, lang: str):
             e_title = entry_raw.find('div', {'class': 'blu-title nero pad0'}).text.strip()
             e_link = f'{URL_HOME}{URL_BOARD[IDX[lang]]}'
             content = entry_raw.find('div', {'class': 'bp-text'})
-            e_descr = content.decode_contents() if content else ''
-            for attachment in entry_raw.find_all('div', {'class': 'field--item'}):
-                e_descr += f'{ICON_FILE}{attachment.find("a").prettify()}'
-            for hyperlink in entry_raw.find_all('div', {'class': 'icon link'}):
-                e_descr += f'{ICON_LINK}{hyperlink.find("a").prettify()}'
+            e_descr = f'{content.decode_contents().strip()}\n' if content else ''
+            for attachment in entry_raw.find_all('div', {'class': ['field--item', 'icon link']}):
+                class_name = ' '.join(attachment.get('class'))
+                match class_name:
+                    case 'field--item':
+                        e_descr += f'%0A{ICON_FILE}{attachment.find("a").prettify()}'
+                    case 'icon link':
+                        e_descr += f'%0A{ICON_LINK}{attachment.find("a").prettify()}'
             entry = Entry(e_title, escape_chars(e_descr), e_link)
         
         entries.append(entry)
