@@ -50,9 +50,13 @@ def parse_news(source: str, lang: str):
                 class_name = ' '.join(attachment.get('class'))
                 match class_name:
                     case 'field--item':
-                        e_descr += f'%0A{ICON_FILE}{attachment.find("a").prettify()}'
+                        e_descr += f'%0A{ICON_FILE}{attachment.find("a").prettify()}'.replace(
+                                'href="/it', f'href="{URL_HOME}/it').replace(
+                                'href="/en', f'href="{URL_HOME}/en')
                     case 'icon link':
-                        e_descr += f'%0A{ICON_LINK}{attachment.find("a").prettify()}'
+                        e_descr += f'%0A{ICON_LINK}{attachment.find("a").prettify()}'.replace(
+                                'href="/it', f'href="{URL_HOME}/it').replace(
+                                'href="/en', f'href="{URL_HOME}/en')
             entry = Entry(e_title, escape_chars(e_descr), e_link)
         
         entries.append(entry)

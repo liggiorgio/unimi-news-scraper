@@ -145,3 +145,8 @@ news_it_debug.xml
 news_jobs_debug.xml
 checklist_jobs_debug.dat
 test_img.py
+main_test.py
+checklist_en_test.dat
+checklist_it_test.dat
+news_en_test.xml
+news_it_test.xml
