@@ -15,8 +15,8 @@ ICON_LINK = '🔗'
 
 
 def create_news_IV_page(url: str):
-    job_res = req.get(url)
-    source = job_res.text
+    news_res = req.get(url)
+    source = news_res.text
     soup = BeautifulSoup(source, 'lxml')
     
     header = soup.find('h1', {'class': 'page-header'}).span.text
@@ -25,6 +25,10 @@ def create_news_IV_page(url: str):
         span.unwrap()
     for div in temp.find_all('div'):
         div.unwrap()
+    for h2 in temp.find_all('h2'):
+        new_tag = soup.new_tag('h3')
+        new_tag.string = h2.get_text()
+        h2.replace_with(new_tag)
     links = soup.find('div', {'class': 'elenco-allegati'})
     if links:
         attachments = soup.new_tag('blockquote')
