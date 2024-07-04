@@ -13,13 +13,17 @@ def main():
     res = requests.get(URL)
     soup = BeautifulSoup(res.text, 'lxml')
     entries_raw = soup.find_all('div', {'class': 'bp-title'})
+    is_news = False
     for entry_raw in entries_raw:
         title = entry_raw.text.lower()
-        if 'bando' in title:
-            if not '2023' in title or '2025' in title:
-                message = 'È USCITO IL BANDO BORSE DI STUDIO!!!!!!'
-                url_send = f'https://api.telegram.org/bot{BOT_TOKEN}/sendMessage?chat_id={CHAT_ID}&text={message}&parse_mode=HTML'
-    print( requests.post(url=url_send) )
+        if not 'bando' in title: continue
+        if not '2023' in title or '2025' in title:
+            is_news = True
+            message = 'È USCITO IL BANDO BORSE DI STUDIO!!!!!!'
+            url_send = f'https://api.telegram.org/bot{BOT_TOKEN}/sendMessage?chat_id={CHAT_ID}&text={message}&parse_mode=HTML'
+            print( requests.post(url=url_send) )
+    print("Bando pubblicato:", is_news)
+
 
 
 if __name__ == '__main__':
