@@ -1,4 +1,4 @@
-name: Python News Scraping Scheduled Script
+name: Python Scholarships Notification Daemon
 
 on:
   schedule:
