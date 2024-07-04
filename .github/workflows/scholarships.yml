@@ -28,5 +28,5 @@ jobs:
       - name: Execute Python Script
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-          CHAT_ID_NEWS_IT: ${{ secrets.CHAT_ID }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
         run: python scholarships_daemon.py
